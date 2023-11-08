@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button, Spinner } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { useToast } from "@chakra-ui/toast";
 import { Box, Stack, Text } from "@chakra-ui/layout";
@@ -48,17 +48,24 @@ const MyChats = ({ fetchAgain }) => {
     }
   };
 
+  /* New Chat Creation Logic: */
   useEffect(() => {
     socket.on("new-chat-formed", () => {
       fetchChats();
     });
-  });
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
     // eslint-disable-next-line
-  }, [account, fetchAgain]);
+  }, [account]);
+
+  useEffect(() => {
+    fetchChats();
+    // eslint-disable-next-line
+  }, [fetchAgain]);
 
   return (
     <Box
@@ -100,6 +107,15 @@ const MyChats = ({ fetchAgain }) => {
         overflowY="hidden">
         {chats ? (
           <Stack overflowY="scroll">
+            {chats.length === 0 && (
+              <Spinner
+                size="xl"
+                w={20}
+                h={20}
+                alignSelf="center"
+                margin="auto"
+              />
+            )}
             {chats.map((chat) => (
               <Box
                 style={{ position: "relative" }}
@@ -107,7 +123,7 @@ const MyChats = ({ fetchAgain }) => {
                   setSelectedChat(chat);
                   setNotification(
                     notification?.filter(
-                      (notif) => chat?._id !== notif?.chat?._id
+                      (notif) => chat?._id !== notif?.chatID?._id
                     )
                   );
                 }}

@@ -4,20 +4,25 @@ import {
   isLastMessage,
   isSameSenderMargin,
 } from "../Config/ChatLogics";
-import { useContext } from "react";
+import { useRef, useContext } from "react";
 import { Avatar } from "@chakra-ui/avatar";
 import { Tooltip } from "@chakra-ui/tooltip";
 import ScrollableFeed from "react-scrollable-feed";
 import { ChatContext } from "../Context/ChatContext";
 
 const ScrollableChat = ({ messages }) => {
+  const initialRef = useRef();
+
   const { account } = useContext(ChatContext);
 
   return (
     <ScrollableFeed>
       {messages &&
         messages.map((msg, index) => (
-          <div style={{ display: "flex" }} key={msg?._id}>
+          <div
+            style={{ display: "flex" }}
+            key={msg?._id}
+            ref={index === 0 ? initialRef : null}>
             {(isSameSender(messages, msg, index, account?._id) ||
               isLastMessage(messages, index, account?._id)) && (
               <Tooltip

@@ -51,8 +51,6 @@ const Login = () => {
         }
       );
 
-      console.log(data);
-
       toast({
         title: "Logged In Successful",
         status: "success",

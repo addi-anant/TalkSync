@@ -26,6 +26,7 @@ const IndividualChat = ({ fetchAgain, setFetchAgain }) => {
   const [istyping, setIsTyping] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
+
   const {
     socket,
     account,
@@ -66,7 +67,7 @@ const IndividualChat = ({ fetchAgain, setFetchAgain }) => {
       setLoading(true);
 
       const { data } = await axiosBaseURL.get(
-        `/message/fetch-all/${selectedChat?._id}`,
+        `/message/fetch/${selectedChat?._id}`,
         {
           headers: {
             Authorization: `Bearer ${account?.token}`,
@@ -74,8 +75,13 @@ const IndividualChat = ({ fetchAgain, setFetchAgain }) => {
         }
       );
 
-      setMessages(data);
+      if (data.length === 0) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(false);
+      setMessages(data);
 
       socket.emit("join chat", selectedChat?._id);
     } catch (error) {
@@ -92,9 +98,10 @@ const IndividualChat = ({ fetchAgain, setFetchAgain }) => {
 
   /* Logic to Fetch Specific Chat Info upon selection: */
   useEffect(() => {
+    setMessages([]);
     fetchMessages();
-    selectedChatCompare = selectedChat;
 
+    selectedChatCompare = selectedChat;
     // eslint-disable-next-line
   }, [selectedChat]);
 
@@ -121,8 +128,8 @@ const IndividualChat = ({ fetchAgain, setFetchAgain }) => {
         );
 
         setFetchAgain(!fetchAgain);
+        setMessages((prev) => [...prev, data]);
         socket.emit("new message", data);
-        setMessages([...messages, data]);
       } catch (error) {
         toast({
           title: "Error Occured!",
@@ -142,17 +149,21 @@ const IndividualChat = ({ fetchAgain, setFetchAgain }) => {
       if (
         /* If No Chat is Selected or When the selectedChat !== Chat for which the New Message is, Then Only Display Notification. */
         !selectedChatCompare ||
-        selectedChatCompare?._id !== newMessageRecieved?.chat?._id
+        selectedChatCompare?._id !== newMessageRecieved?.chatID?._id
       ) {
         if (!notification?.includes(newMessageRecieved)) {
-          setNotification([newMessageRecieved, ...notification]);
           setFetchAgain(!fetchAgain);
+          setNotification((prev) => [newMessageRecieved, ...prev]);
         }
       } else {
-        setMessages([...messages, newMessageRecieved]);
+        setMessages((prev) => [...prev, newMessageRecieved]);
       }
+
+      setFetchAgain(!fetchAgain);
     });
-  }); /* No dependency [] -> Will be Fired Everytime any state changes in our App.  */
+
+    // eslint-disable-next-line
+  }, []);
 
   /* Typing Animation Handler: */
   const typingHandler = (event) => {
