@@ -10,7 +10,7 @@ const messageSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-messageSchema.index({ chatID: 1 });
+messageSchema.index({ chatID: 1, timestamps: 1 });
 
 const Message = mongoose.model("Message", messageSchema);
 module.exports = Message;

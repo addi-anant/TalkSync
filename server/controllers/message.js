@@ -37,11 +37,14 @@ module.exports.sendMessage = asyncHandler(async (req, res) => {
 });
 
 /* Fetch All Messages (:chatID) */
-module.exports.fetchAllMessages = asyncHandler(async (req, res) => {
+module.exports.fetchMessages = asyncHandler(async (req, res) => {
+  const { chatID } = req.params;
+
   try {
-    const messages = await Message.find({ chatID: req?.params?.chatID })
+    const messages = await Message.find({ chatID })
       .populate("sender", "name pic email")
-      .populate("chatID");
+      .populate("chatID")
+      .sort({ updatedAt: 1 });
 
     return res.status(200).json(messages);
   } catch (error) {
