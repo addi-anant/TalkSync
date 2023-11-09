@@ -38,6 +38,8 @@ const MyChats = ({ fetchAgain }) => {
     }
   };
 
+  console.log("fetchAgain");
+
   /* New Chat Creation Logic: */
   useEffect(() => {
     socket.on("new-chat-formed", () => {

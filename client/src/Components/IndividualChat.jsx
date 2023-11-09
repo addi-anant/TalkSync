@@ -81,8 +81,6 @@ const IndividualChat = ({ setFetchAgain }) => {
         }
       );
 
-      console.log(data);
-
       if (data.length === 0) {
         setLoading(false);
         setHasNextPage(false);
@@ -119,6 +117,7 @@ const IndividualChat = ({ setFetchAgain }) => {
 
   /* Realtime Recieve Message Logic: */
   useEffect(() => {
+    console.log("New Message Recieved.");
     socket.on("message recieved", (newMessageRecieved) => {
       if (
         /* If No Chat is Selected or When the selectedChat !== Chat for which the New Message is, Then Only Display Notification. */

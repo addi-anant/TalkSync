@@ -9,6 +9,7 @@ import { Avatar } from "@chakra-ui/avatar";
 import { Tooltip } from "@chakra-ui/tooltip";
 import ScrollableFeed from "react-scrollable-feed";
 import { ChatContext } from "../Context/ChatContext";
+import { Box, Spinner } from "@chakra-ui/react";
 
 const ScrollableChat = ({
   messages,
@@ -20,8 +21,8 @@ const ScrollableChat = ({
   const { account } = useContext(ChatContext);
 
   useEffect(() => {
-    viewRef?.current?.scrollIntoView();
-  }, [messages]);
+    !prevChatLoading && viewRef?.current?.scrollIntoView();
+  }, [prevChatLoading]);
 
   const messageRef = useRef();
 
@@ -51,15 +52,17 @@ const ScrollableChat = ({
 
   return (
     <ScrollableFeed onScroll={scrollHandler}>
-      {prevChatLoading && "Loading...."}
+      {prevChatLoading && (
+        <Box display="flex" alignItems="center" justifyContent="center">
+          <Spinner size="sm" w={7} h={7} alignSelf="center" margin="auto" />
+        </Box>
+      )}
       {messages &&
         messages.map((msg, index) => (
           <div
             style={{ display: "flex" }}
             key={msg?._id}
-            // ref={index === 0 ? messageRef : null}>
             ref={index === 0 ? messageRef : index === 24 ? viewRef : null}>
-            {/* ref={index === 24 ? viewRef : index === 0 ? messageRef : null}> */}
             {(isSameSender(messages, msg, index, account?._id) ||
               isLastMessage(messages, index, account?._id)) && (
               <Tooltip
@@ -104,5 +107,3 @@ const ScrollableChat = ({
 };
 
 export default ScrollableChat;
-
-// ref={index === 24 ? viewRef : index === 0 ? messageRef : null}>

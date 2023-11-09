@@ -1,7 +1,7 @@
 import "./styles.css";
 import { Box } from "@chakra-ui/react";
 
-const NotificationBadge = ({ value }) => {
+const NotificationBadge = () => {
   return (
     <Box>
       <div
@@ -18,9 +18,7 @@ const NotificationBadge = ({ value }) => {
           background: "#39A7FF",
           color: "white",
           fontSize: "12px",
-        }}>
-        {value}
-      </div>
+        }}></div>
     </Box>
   );
 };
