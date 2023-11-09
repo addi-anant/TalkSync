@@ -74,9 +74,6 @@ module.exports.register = asyncHandler(async (req, res) => {
   }
 });
 
-/* New Chat: */
-// module.export.newChat = async (req, res) => {};
-
 /* Get All Users: */
 module.exports.getAllUsers = asyncHandler(async (req, res) => {
   const keyword = req?.query?.search

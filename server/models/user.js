@@ -33,5 +33,7 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
+userSchema.index({ email: 1 });
+
 const User = mongoose.model("User", userSchema);
 module.exports = User;

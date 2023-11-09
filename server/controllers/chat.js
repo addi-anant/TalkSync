@@ -1,5 +1,5 @@
-const Chat = require("../models/chat");
 const User = require("../models/user");
+const Chat = require("../models/chat");
 const asyncHandler = require("express-async-handler");
 
 /* Fetch Chat: (Logged In Account) */
@@ -38,7 +38,7 @@ module.exports.accessChat = asyncHandler(async (req, res) => {
     return res.sendStatus(400);
   }
 
-  /* Populating Field in Model: */
+  /* Check if Chat Already Existed b/w the two Accounts: */
   let isChat = await Chat.find({
     isGroupChat: false,
     $and: [
@@ -87,13 +87,12 @@ module.exports.accessChat = asyncHandler(async (req, res) => {
 
 /* Create Group Chat: */
 module.exports.createGroupChat = asyncHandler(async (req, res) => {
-  if (!req.body.users || !req.body.name) {
+  if (!req?.body?.users || !req?.body?.name)
     return res.status(400).send({ message: "Please Fill all the feilds." });
-  }
 
   let users = JSON.parse(req?.body?.users);
 
-  /* Group Require More than 2 users. */
+  /* Group Formation Require More than 2 users. */
   if (users?.length < 2) {
     return res
       .status(400)
@@ -121,13 +120,9 @@ module.exports.createGroupChat = asyncHandler(async (req, res) => {
         $push: { chats: groupChat?._id },
       },
       { new: true }
-    )
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    ).catch((Error) => {
+      console.log(`Error updating user while creating group Chat: ${Error}`);
+    });
 
     const groupChatInfo = await Chat.findOne({ _id: groupChat._id })
       .populate("users", "-password")
@@ -206,9 +201,5 @@ module.exports.removeFromGroup = asyncHandler(async (req, res) => {
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
 
-  if (!removeAccount) {
-    return res.status(404);
-  } else {
-    return res.json(removeAccount);
-  }
+  return !removeAccount ? res.status(404) : res.json(removeAccount);
 });
