@@ -5,9 +5,10 @@ const asyncHandler = require("express-async-handler");
 /* Fetch Chat: (Logged In Account) */
 module.exports.fetchChat = asyncHandler(async (req, res) => {
   try {
-    let user = await User.findById(req?.user?._id)
-      .sort({ updatedAt: -1 })
-      .populate("chats");
+    let user = await User.findById(req?.user?._id).populate({
+      path: "chats",
+      options: { sort: { updatedAt: -1 } }, // Sort chats by updatedAt in descending order.
+    });
 
     user = await Chat.populate(user, {
       path: "chats.users",

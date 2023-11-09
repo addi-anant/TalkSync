@@ -151,6 +151,7 @@ const Signup = () => {
         <Input
           placeholder="Enter Your Name"
           onChange={(e) => setName(e.target.value)}
+          autoComplete="off"
         />
       </FormControl>
 
@@ -161,6 +162,7 @@ const Signup = () => {
           type="email"
           placeholder="Enter Your Email Address"
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="off"
         />
       </FormControl>
 
@@ -172,6 +174,7 @@ const Signup = () => {
             type={show ? "text" : "password"}
             placeholder="Enter Password"
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="off"
           />
           <InputRightElement width="4.5rem">
             <Button h="1.75rem" size="sm" onClick={handleClick}>
@@ -189,6 +192,7 @@ const Signup = () => {
             type={show ? "text" : "password"}
             placeholder="Confirm password"
             onChange={(e) => setConfirmpassword(e.target.value)}
+            autoComplete="off"
           />
           <InputRightElement width="4.5rem">
             <Button h="1.75rem" size="sm" onClick={handleClick}>
@@ -206,6 +210,7 @@ const Signup = () => {
           p={1.5}
           accept="image/*"
           onChange={(e) => postDetails(e.target.files[0])}
+          autoComplete="off"
         />
       </FormControl>
 
