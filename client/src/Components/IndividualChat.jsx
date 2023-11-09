@@ -17,7 +17,7 @@ import UpdateGroupChatModal from "./UpdateGroupChatModal";
 
 let selectedChatCompare;
 
-const IndividualChat = ({ fetchAgain, setFetchAgain }) => {
+const IndividualChat = ({ setFetchAgain }) => {
   const toast = useToast();
 
   const [typing, setTyping] = useState(false);
@@ -127,7 +127,7 @@ const IndividualChat = ({ fetchAgain, setFetchAgain }) => {
           }
         );
 
-        setFetchAgain(!fetchAgain);
+        setFetchAgain((prev) => !prev);
         setMessages((prev) => [...prev, data]);
         socket.emit("new message", data);
       } catch (error) {
@@ -152,14 +152,13 @@ const IndividualChat = ({ fetchAgain, setFetchAgain }) => {
         selectedChatCompare?._id !== newMessageRecieved?.chatID?._id
       ) {
         if (!notification?.includes(newMessageRecieved)) {
-          setFetchAgain(!fetchAgain);
           setNotification((prev) => [newMessageRecieved, ...prev]);
         }
       } else {
         setMessages((prev) => [...prev, newMessageRecieved]);
       }
 
-      setFetchAgain(!fetchAgain);
+      setFetchAgain((prev) => !prev);
     });
 
     // eslint-disable-next-line
@@ -239,7 +238,6 @@ const IndividualChat = ({ fetchAgain, setFetchAgain }) => {
                   {selectedChat.chatName.toUpperCase()}
 
                   <UpdateGroupChatModal
-                    fetchAgain={fetchAgain}
                     fetchMessages={fetchMessages}
                     setFetchAgain={setFetchAgain}
                   />
@@ -271,7 +269,6 @@ const IndividualChat = ({ fetchAgain, setFetchAgain }) => {
               </div>
             )}
 
-            {/* style={{ border: "1px solid black" }} */}
             <Box height="6" mt={2}>
               <Text fontSize="14" ml={10}>
                 {istyping && "Typing..."}

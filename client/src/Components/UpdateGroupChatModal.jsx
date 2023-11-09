@@ -23,7 +23,7 @@ import { useState, useContext } from "react";
 import { ChatContext } from "../Context/ChatContext";
 import { axiosBaseURL } from "../Config/axiosBaseURL";
 
-const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
+const UpdateGroupChatModal = ({ fetchMessages, setFetchAgain }) => {
   const toast = useToast();
 
   const [search, setSearch] = useState("");
@@ -35,6 +35,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
 
   const { account, selectedChat, setSelectedChat } = useContext(ChatContext);
 
+  /* Search For Accounts: */
   const handleSearch = async (query) => {
     setSearch(query);
     if (!query) return;
@@ -66,6 +67,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
     }
   };
 
+  /* Rename Group: */
   const handleRename = async () => {
     if (!groupChatName) return;
 
@@ -87,7 +89,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
 
       setSelectedChat(data);
       setRenameLoading(false);
-      setFetchAgain(!fetchAgain);
+      setFetchAgain((prev) => !prev);
     } catch (error) {
       console.log(error);
       toast({
@@ -104,6 +106,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
     setGroupChatName("");
   };
 
+  /* Add Account to Group: */
   const handleAddUser = async (member) => {
     if (selectedChat.users.find((user) => user?._id === member._id)) {
       toast({
@@ -146,7 +149,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
       setLoading(false);
       setSearchResult([]);
       setSelectedChat(data);
-      setFetchAgain(!fetchAgain);
+      setFetchAgain((prev) => !prev);
     } catch (error) {
       toast({
         title: "Error Occured!",
@@ -161,6 +164,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
     setGroupChatName("");
   };
 
+  /* Remove Account From Group: */
   const handleRemove = async (member) => {
     if (selectedChat?.groupAdmin?._id === member?._id) {
       toast({
@@ -209,7 +213,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
 
       fetchMessages();
       setLoading(false);
-      setFetchAgain(!fetchAgain);
+      setFetchAgain((prev) => !prev);
     } catch (error) {
       console.log(error);
       toast({

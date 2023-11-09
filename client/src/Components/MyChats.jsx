@@ -1,30 +1,20 @@
 import { Button, Spinner } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { useToast } from "@chakra-ui/toast";
-import { Box, Stack, Text } from "@chakra-ui/layout";
+import { Box, Stack } from "@chakra-ui/layout";
 import { useState, useEffect, useContext } from "react";
 
 import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./GroupChatModal";
-import NotificationBadge from "./NotificationBadge";
 import { ChatContext } from "../Context/ChatContext";
 import { axiosBaseURL } from "../Config/axiosBaseURL";
-import { getOtherUser, getSender } from "../Config/ChatLogics";
+import IndividualChatName from "./IndividualChatName";
 
 const MyChats = ({ fetchAgain }) => {
   const toast = useToast();
   const [loggedUser, setLoggedUser] = useState("");
-  const {
-    chats,
-    socket,
-    account,
-    setChats,
-    selectedChat,
-    notification,
-    setSelectedChat,
-    setNotification,
-    onlineAccountList,
-  } = useContext(ChatContext);
+  const { chats, socket, account, setChats, selectedChat } =
+    useContext(ChatContext);
 
   /* Fetch All Chat For Logged In Account: */
   const fetchChats = async () => {
@@ -60,12 +50,7 @@ const MyChats = ({ fetchAgain }) => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
     // eslint-disable-next-line
-  }, [account]);
-
-  useEffect(() => {
-    fetchChats();
-    // eslint-disable-next-line
-  }, [fetchAgain]);
+  }, [account, fetchAgain]);
 
   return (
     <Box
@@ -116,84 +101,13 @@ const MyChats = ({ fetchAgain }) => {
                 margin="auto"
               />
             )}
+
             {chats.map((chat) => (
-              <Box
-                style={{ position: "relative" }}
-                onClick={() => {
-                  setSelectedChat(chat);
-                  setNotification(
-                    notification?.filter(
-                      (notif) => chat?._id !== notif?.chatID?._id
-                    )
-                  );
-                }}
-                cursor="pointer"
-                bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
-                color={selectedChat === chat ? "white" : "black"}
-                px={3}
-                py={2}
-                borderRadius="lg"
-                key={chat._id}
-                display="flex"
-                justifyContent="space-between"
-                alignItems="end">
-                <Box w="100%" style={{ position: "relative" }}>
-                  <Box>
-                    <Text>
-                      <>
-                        {!chat?.isGroupChat
-                          ? getSender(loggedUser, chat?.users)
-                          : chat?.chatName}
-                      </>
-                    </Text>
-
-                    {chat?.latestMessage ? (
-                      <Text fontSize="xs">
-                        <b>{chat?.latestMessage?.sender?.name} : </b>
-                        {chat?.latestMessage?.content?.length > 50
-                          ? chat?.latestMessage?.content?.substring(0, 51) +
-                            "..."
-                          : chat?.latestMessage?.content}
-                      </Text>
-                    ) : (
-                      "Start a Conversation..."
-                    )}
-                  </Box>
-
-                  {/* Online Status: */}
-                  {!chat?.isGroupChat &&
-                    onlineAccountList?.some(
-                      (acc) => acc === getOtherUser(account, chat?.users)
-                    ) && (
-                      <Box
-                        style={{
-                          height: "10px",
-                          width: "10px",
-                          backgroundColor: "#54B435",
-                          borderRadius: "100%",
-                          position: "absolute",
-                          top: "5px",
-                          right: "5px",
-                        }}></Box>
-                    )}
-                </Box>
-
-                {/* Count of the notification: */}
-                {notification?.reduce((count, notif) => {
-                  count = count + (notif?.chatID?._id === chat?._id ? 1 : 0);
-                  return count;
-                }, 0) ? (
-                  <NotificationBadge
-                    value={notification?.reduce((count, notif) => {
-                      count =
-                        count + (notif?.chatID?._id === chat?._id ? 1 : 0);
-                      return count;
-                    }, 0)}
-                  />
-                ) : (
-                  <></>
-                )}
-              </Box>
+              <IndividualChatName
+                key={chat?._id}
+                chat={chat}
+                loggedUser={loggedUser}
+              />
             ))}
           </Stack>
         ) : (

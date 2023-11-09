@@ -6,15 +6,19 @@ const asyncHandler = require("express-async-handler");
 module.exports.fetchChat = asyncHandler(async (req, res) => {
   try {
     let user = await User.findById(req?.user?._id)
-      .populate("chats")
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .populate("chats");
 
     user = await Chat.populate(user, {
       path: "chats.users",
     });
 
-    const { chats } = await Chat.populate(user, {
+    user = await Chat.populate(user, {
       path: "chats.latestMessage",
+    });
+
+    const { chats } = await User.populate(user, {
+      path: "chats.latestMessage.sender",
     });
 
     return res.status(200).send(chats);
