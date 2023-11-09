@@ -19,11 +19,12 @@ let selectedChatCompare;
 const IndividualChat = ({ setFetchAgain }) => {
   const toast = useToast();
 
-  // const [typing, setTyping] = useState(false);
+  const [pageNo, setPageNo] = useState(1);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [istyping, setIsTyping] = useState(false);
-  // const [newMessage, setNewMessage] = useState("");
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const [prevChatLoading, setPrevChatLoading] = useState(false);
   const [socketConnected, setSocketConnected] = useState(false);
 
   const {
@@ -58,15 +59,21 @@ const IndividualChat = ({ setFetchAgain }) => {
     // eslint-disable-next-line
   }, [socket, account]);
 
+  useEffect(() => {
+    setPageNo(1);
+    setHasNextPage(true);
+  }, [selectedChat]);
+
   /* Fetch Message upon chat selection: */
-  const fetchMessages = async () => {
+  const fetchMessages = async (prevChat) => {
     if (!selectedChat) return;
 
     try {
-      setLoading(true);
+      !prevChat && setLoading(true);
+      prevChat && setPrevChatLoading(true);
 
       const { data } = await axiosBaseURL.get(
-        `/message/fetch/${selectedChat?._id}`,
+        `/message/fetch-by-range/${selectedChat?._id}/${pageNo}`,
         {
           headers: {
             Authorization: `Bearer ${account?.token}`,
@@ -74,13 +81,19 @@ const IndividualChat = ({ setFetchAgain }) => {
         }
       );
 
+      console.log(data);
+
       if (data.length === 0) {
         setLoading(false);
+        setHasNextPage(false);
+        setPrevChatLoading(false);
         return;
       }
 
       setLoading(false);
-      setMessages(data);
+      setPrevChatLoading(false);
+      setPageNo((prev) => prev + 1);
+      setMessages((prev) => [...data, ...prev]);
 
       socket.emit("join chat", selectedChat?._id);
     } catch (error) {
@@ -202,7 +215,12 @@ const IndividualChat = ({ setFetchAgain }) => {
               />
             ) : (
               <div className="messages">
-                <ScrollableChat messages={messages} />
+                <ScrollableChat
+                  messages={messages}
+                  hasNextPage={hasNextPage}
+                  fetchMessages={fetchMessages}
+                  prevChatLoading={prevChatLoading}
+                />
               </div>
             )}
             <InputPanel

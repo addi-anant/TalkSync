@@ -4,25 +4,62 @@ import {
   isLastMessage,
   isSameSenderMargin,
 } from "../Config/ChatLogics";
-import { useRef, useContext } from "react";
+import { useRef, useContext, useEffect } from "react";
 import { Avatar } from "@chakra-ui/avatar";
 import { Tooltip } from "@chakra-ui/tooltip";
 import ScrollableFeed from "react-scrollable-feed";
 import { ChatContext } from "../Context/ChatContext";
 
-const ScrollableChat = ({ messages }) => {
-  const initialRef = useRef();
-
+const ScrollableChat = ({
+  messages,
+  hasNextPage,
+  fetchMessages,
+  prevChatLoading,
+}) => {
+  const viewRef = useRef();
   const { account } = useContext(ChatContext);
 
+  useEffect(() => {
+    viewRef?.current?.scrollIntoView();
+  }, [messages]);
+
+  const messageRef = useRef();
+
+  useEffect(() => {
+    window.addEventListener("scroll", scrollHandler);
+    return () => window.removeEventListener("scroll", scrollHandler);
+
+    // eslint-disable-next-line
+  }, []);
+
+  const isInViewport = (element) => {
+    const rect = element.getBoundingClientRect();
+    if (
+      rect.top - 150 >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <=
+        (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    ) {
+      hasNextPage && !prevChatLoading && fetchMessages(true);
+    }
+  };
+
+  const scrollHandler = () => {
+    isInViewport(messageRef.current);
+  };
+
   return (
-    <ScrollableFeed>
+    <ScrollableFeed onScroll={scrollHandler}>
+      {prevChatLoading && "Loading...."}
       {messages &&
         messages.map((msg, index) => (
           <div
             style={{ display: "flex" }}
             key={msg?._id}
-            ref={index === 0 ? initialRef : null}>
+            // ref={index === 0 ? messageRef : null}>
+            ref={index === 0 ? messageRef : index === 24 ? viewRef : null}>
+            {/* ref={index === 24 ? viewRef : index === 0 ? messageRef : null}> */}
             {(isSameSender(messages, msg, index, account?._id) ||
               isLastMessage(messages, index, account?._id)) && (
               <Tooltip
@@ -67,3 +104,5 @@ const ScrollableChat = ({ messages }) => {
 };
 
 export default ScrollableChat;
+
+// ref={index === 24 ? viewRef : index === 0 ? messageRef : null}>
